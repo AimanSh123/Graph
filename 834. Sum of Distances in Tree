@@ -1,0 +1,69 @@
+//brute force
+public int[] sumOfDistancesInTree(int n, int[][] edges) {
+        int [] sol = new int[n];
+        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+        for(int i = 0; i < n; i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int i = 0; i < edges.length; i++){
+            adj.get(edges[i][0]).add(edges[i][1]);
+            adj.get(edges[i][1]).add(edges[i][0]);
+        }
+        for(int i = 0; i < n; i++){
+            boolean [] visited = new boolean[n];
+            Queue<Integer> q = new ArrayDeque<>();
+            q.add(i); visited[i] = true; 
+            int [] dist_arr = new int [n];
+            while(!q.isEmpty()){
+                int curr = q.remove();
+                for(int neigh : adj.get(curr)){
+                    if(!visited[neigh]){
+                        visited[neigh] = true;
+                        dist_arr[neigh] = dist_arr[curr] + 1;
+                        q.add(neigh);
+                    }
+                }
+            }int sum = 0;
+            for(int it : dist_arr){
+                sum += it;
+            }
+            sol[i] = sum;
+        }
+        return sol;
+    }
+//optimal approach
+  public int [] dist; 
+    public int [] count;
+    public int[] sumOfDistancesInTree(int n, int[][] edges) {
+        dist = new int[n];
+        count = new int[n];
+        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+        for(int i = 0; i < n; i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int i = 0; i < edges.length; i++){
+            adj.get(edges[i][0]).add(edges[i][1]);
+            adj.get(edges[i][1]).add(edges[i][0]);
+        }
+        preprocess(adj, 0, -1);
+        calculate(adj, 0, -1);
+        return dist;
+    }
+    public void preprocess(ArrayList<ArrayList<Integer>>adj,int node,int parent){
+          for(int neigh : adj.get(node)){
+              if(neigh != parent){
+                  preprocess(adj, neigh, node);
+                  count[node] += count[neigh];
+                  dist[node] += (dist[neigh] + count[neigh]);
+              }
+          }
+          count[node] ++;
+    }
+    public void calculate(ArrayList<ArrayList<Integer>>adj,int node,int parent){
+        for(int neigh : adj.get(node)){
+            if(neigh == parent) continue;
+            dist[neigh] = dist[node] - count[neigh] + count.length - count[neigh];
+            calculate(adj, neigh, node);
+        }
+    }
+
